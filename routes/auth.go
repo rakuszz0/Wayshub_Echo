@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func AuthRoutes(e *echo.Echo) {
+func AuthRoutes(e *echo.Group) {
 	channelRepository := repositories.RepositoryChannel(mysql.DB)
 	h := handlers.HandlerAuth(channelRepository)
 

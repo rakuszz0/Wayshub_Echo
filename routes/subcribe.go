@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func SubscribeRoutes(e *echo.Echo) {
+func SubscribeRoutes(e *echo.Group) {
 	subscribeRepository := repositories.RepositorySubscribe(mysql.DB)
 	h := handlers.HandlerSubscribe(subscribeRepository)
 

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	// "fmt"
 	"net/http"
 	"strconv"
 	commentdto "wayshub/dto/comment"
@@ -15,7 +15,7 @@ import (
 )
 
 type handlerComment struct {
-	CommentRepository respositories.CommentRepository
+	CommentRepository repositories.CommentRepository
 }
 
 func HandlerComment(CommentRepository repositories.CommentRepository) *handlerComment {
@@ -25,10 +25,10 @@ func HandlerComment(CommentRepository repositories.CommentRepository) *handlerCo
 func (h *handlerComment) FindComments(c echo.Context) error {
 	comments, err := h.CommentRepository.FindComments()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error})
+		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: comment})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: comments})
 }
 
 func (h *handlerComment) GetComment(c echo.Context) error {
@@ -37,7 +37,7 @@ func (h *handlerComment) GetComment(c echo.Context) error {
 
 	comment, err := h.CommentRepository.GetComment(id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error})
+		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: comment})
@@ -72,7 +72,7 @@ func (h *handlerComment) CreateComment(c echo.Context) error {
 
 	comment, _ = h.CommentRepository.GetComment(comment.ID)
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: comment})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: comment})
 }
 
 func (h *handlerComment) UpdateComment(c echo.Context) error {
@@ -104,7 +104,7 @@ func (h *handlerComment) UpdateComment(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: data})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: data})
 }
 
 func (h *handlerComment) DeleteComment(c echo.Context) error {
@@ -127,7 +127,7 @@ func (h *handlerComment) DeleteComment(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: DeleteCommentResponse(data)})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: DeleteCommentResponse(data)})
 }
 
 func DeleteCommentResponse(u models.Comments) commentdto.DeleteResponse {

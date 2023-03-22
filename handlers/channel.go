@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	// "encoding/json"
+	// "fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -15,7 +15,7 @@ import (
 
 	"github.com/cloudinary/cloudinary-go"
 	"github.com/cloudinary/cloudinary-go/api/uploader"
-	"github.com/go-playground/validator/v10"
+	// "github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -44,7 +44,8 @@ func (h *handlerChannel) FindChannels(c echo.Context) error {
 		channels[i].Photo = os.Getenv("PATH_FILE") + p.Photo
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: channels})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: channels})
+
 }
 
 func (h *handlerChannel) GetChannel(c echo.Context) error {
@@ -73,7 +74,8 @@ func (h *handlerChannel) GetChannel(c echo.Context) error {
 		channel.Subscription[i].OtherPhoto = os.Getenv("PATH_FILE") + p.OtherPhoto
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: convertResponse(channel)})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: convertResponse(channel)})
+
 }
 
 func (h *handlerChannel) UpdateChannel(c echo.Context) error {
@@ -103,12 +105,14 @@ func (h *handlerChannel) UpdateChannel(c echo.Context) error {
 
 	resp1, err := cld.Upload.Upload(ctx, fileCover, uploader.UploadParams{Folder: "WaysHub"})
 	if err != nil {
-		fmt.Println(err.Error())
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	resp2, err := cld.Upload.Upload(ctx, filePhoto, uploader.UploadParams{Folder: "WaysHub"})
 	if err != nil {
-		fmt.Println(err.Error())
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+		return c.JSON(http.StatusBadRequest, response)
 	}
 
 	var request channeldto.UpdateChannelRequest
@@ -159,8 +163,7 @@ func (h *handlerChannel) UpdateChannel(c echo.Context) error {
 	channel.Cover = os.Getenv("PATH_FILE") + channel.Cover
 	channel.Photo = os.Getenv("PATH_FILE") + channel.Photo
 
-	response := dto.SuccessResult{Code: http.StatusOK, Data: data}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: data})
 
 }
 
@@ -178,7 +181,7 @@ func (h *handlerChannel) DeleteChannel(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: deleteResponse(data)})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: deleteResponse(data)})
 }
 
 func (h *handlerChannel) PlusSubscriber(c echo.Context) error {
@@ -196,7 +199,7 @@ func (h *handlerChannel) PlusSubscriber(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: data})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: data})
 }
 
 func (h *handlerChannel) MinusSubscriber(c echo.Context) error {
@@ -214,7 +217,7 @@ func (h *handlerChannel) MinusSubscriber(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: data})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: data})
 }
 
 func convertResponse(u models.Channel) channeldto.ChannelResponse {

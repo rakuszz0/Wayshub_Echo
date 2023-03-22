@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func ChannelRoutes(e *echo.Echo) {
+func ChannelRoutes(e *echo.Group) {
 	channelRepository := repositories.RepositoryChannel(mysql.DB)
 	h := handlers.HandlerChannel(channelRepository)
 

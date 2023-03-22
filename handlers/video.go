@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"context"
-	"fmt"
+	// "fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -45,8 +45,7 @@ func (h *handlerVideo) FindVideos(c echo.Context) error {
 		videos[i].Video = videoPath
 	}
 
-	response := dto.SuccessResult{Status: "success", Data: videos}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: videos})
 }
 
 func (h *handlerVideo) GetVideo(c echo.Context) error {
@@ -61,8 +60,7 @@ func (h *handlerVideo) GetVideo(c echo.Context) error {
 	video.Thumbnail = os.Getenv("PATH_FILE") + video.Thumbnail
 	video.Video = os.Getenv("PATH_FILE") + video.Video
 
-	response := dto.SuccessResult{Status: "success", Data: subscribe}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: video})
 }
 
 func (h *handlerVideo) CreateVideo(c echo.Context) error {
@@ -84,12 +82,12 @@ func (h *handlerVideo) CreateVideo(c echo.Context) error {
 
 	resp1, err := cld.Upload.Upload(ctx, fileThumbnail, uploader.UploadParams{Folder: "wayshub"})
 	if err != nil {
-		fmt.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
 	resp2, err := cld.Upload.Upload(ctx, fileVideo, uploader.UploadParams{Folder: "wayshub"})
 	if err != nil {
-		fmt.Println(err.Error())
+		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
 	request := videodto.CreateVideoRequest{
@@ -121,8 +119,7 @@ func (h *handlerVideo) CreateVideo(c echo.Context) error {
 
 	video, _ = h.VideoRepository.GetVideo(video.ID)
 
-	response := dto.SuccessResult{Status: "success", Data: video}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: video})
 }
 
 func (h *handlerVideo) UpdateVideo(c echo.Context) error {
@@ -175,7 +172,7 @@ func (h *handlerVideo) UpdateVideo(c echo.Context) error {
 	video.Thumbnail = os.Getenv("PATH_FILE") + video.Thumbnail
 	video.Video = os.Getenv("PATH_FILE") + video.Video
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: data})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: data})
 }
 
 func (h *handlerVideo) DeleteVideo(c echo.Context) error {
@@ -192,7 +189,7 @@ func (h *handlerVideo) DeleteVideo(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: DeleteVideoResponse(data)})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: DeleteVideoResponse(data)})
 }
 
 func (h *handlerVideo) FindVideosByChannelId(c echo.Context) error {
@@ -208,8 +205,7 @@ func (h *handlerVideo) FindVideosByChannelId(c echo.Context) error {
 	videos.Thumbnail = os.Getenv("PATH_FILE") + videos.Thumbnail
 	videos.Video = os.Getenv("PATH_FILE") + videos.Video
 
-	response := dto.SuccessResult{Status: "success", Data: videos}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: videos})
 }
 
 func (h *handlerVideo) FindMyVideos(c echo.Context) error {
@@ -229,7 +225,7 @@ func (h *handlerVideo) FindMyVideos(c echo.Context) error {
 		videos[i].Video = os.Getenv("PATH_FILE") + p.Video
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: videos})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: videos})
 }
 
 func (h *handlerVideo) UpdateViews(c echo.Context) error {
@@ -247,7 +243,7 @@ func (h *handlerVideo) UpdateViews(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: data})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: data})
 }
 
 func DeleteVideoResponse(u models.Video) videodto.DeleteResponse {

@@ -6,34 +6,43 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 func UploadCover(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		r := c.Request()
 		// Upload file
 		// FormFile returns the first file for the given key `myFile`
 		// it also returns the FileHeader so we can get the Filename,
 		// the Header and the size of the file
-		file, err := c.FormFile("cover")
+		file, _, err := r.FormFile("cover")
 
-		if err != nil && c.Request().Method == "PATCH" {
-			c.Set("dataCover", "false")
-			return next(c)
+		if err != nil && r.Method == "PATCH" {
+			ctx := context.WithValue(r.Context(), "dataCover", "false")
+			c.SetRequest(c.Request().WithContext(ctx))
+			return nil
 		}
 
 		if err != nil {
 			fmt.Println(err)
-			return c.JSON(http.StatusBadRequest, "Error Retrieving the File")
+			json.NewEncoder(c.Response().Writer).Encode("Error Retrieving the File")
+			return nil
 		}
 		defer file.Close()
-
+		// fmt.Printf("Uploaded File: %+v\n", handler.Filename)
+		// fmt.Printf("File Size: %+v\n", handler.Size)
+		// fmt.Printf("MIME Header: %+v\n", handler.Header)
 		const MAX_UPLOAD_SIZE = 10 << 20 // 10MB
 		// Parse our multipart form, 10 << 20 specifies a maximum
 		// upload of 10 MB files.
-		c.Request().ParseMultipartForm(MAX_UPLOAD_SIZE)
-		if c.Request().ContentLength > MAX_UPLOAD_SIZE {
+		r.ParseMultipartForm(MAX_UPLOAD_SIZE)
+		if r.ContentLength > MAX_UPLOAD_SIZE {
+			c.Response().Writer.WriteHeader(http.StatusBadRequest)
 			response := Result{Code: http.StatusBadRequest, Message: "Max size in 10mb"}
-			return c.JSON(http.StatusBadRequest, response)
+			json.NewEncoder(c.Response().Writer).Encode(response)
+			return nil
 		}
 
 		// Create a temporary file within our temp-images directory that follows
@@ -42,7 +51,8 @@ func UploadCover(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			fmt.Println(err)
 			fmt.Println("path upload error")
-			return c.JSON(http.StatusInternalServerError, err)
+			json.NewEncoder(c.Response().Writer).Encode(err)
+			return nil
 		}
 		defer tempFile.Close()
 
@@ -61,6 +71,7 @@ func UploadCover(next echo.HandlerFunc) echo.HandlerFunc {
 
 		// add filename to ctx
 		c.Set("dataCover", data)
+
 		return next(c)
 	}
 }

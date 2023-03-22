@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"context"
-	"encoding/json"
+	// "context"
+	// "encoding/json"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
@@ -18,7 +18,7 @@ type Result struct {
 
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		token := r.Header.Get("Authorization")
+		token := c.Request().Header.Get("Authorization")
 
 		if token == "" {
 			return c.JSON(http.StatusUnauthorized, dto.ErrorResult{Code: http.StatusBadRequest, Message: "unauthorized"})
@@ -31,7 +31,7 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, Result{Code: http.StatusBadRequest, Message: "unathorized"})
 		}
 
-		c.Set("userLogin", claims)
+		c.Set("channelInfo", claims)
 		return next(c)
 	}
 }

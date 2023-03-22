@@ -66,8 +66,7 @@ func UploadVideo(next echo.HandlerFunc) echo.HandlerFunc {
 		// fileVideo := data[8:] // split uploads/
 
 		// add filename to ctx
-		ctx := context.WithValue(c.Request().Context(), "dataVideo", data)
-		c.SetRequest(c.Request().WithContext(ctx))
+		c.Set("dataVideo", data)
 		return next(c)
 	}
 }

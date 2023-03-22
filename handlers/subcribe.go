@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"fmt"
+	// "fmt"
 	"net/http"
+	"os"
 	"strconv"
 	dto "wayshub/dto/result"
-	subcribedto "wayshub/dto/subcribe"
+	subscribedto "wayshub/dto/subcribe"
 	"wayshub/models"
 	"wayshub/repositories"
 
@@ -35,7 +36,7 @@ func (h *handlerSubscribe) FindSubscribes(c echo.Context) error {
 		subscribes[i].OtherPhoto = os.Getenv("PATH_FILE") + p.OtherPhoto
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: subscribes})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: subscribes})
 }
 
 func (h *handlerSubscribe) GetSubscribe(c echo.Context) error {
@@ -50,8 +51,7 @@ func (h *handlerSubscribe) GetSubscribe(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	response := dto.SuccessResult{Status: "success", Data: subscribe}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: subscribe})
 }
 
 func (h *handlerSubscribe) GetSubscribeByOther(c echo.Context) error {
@@ -66,8 +66,7 @@ func (h *handlerSubscribe) GetSubscribeByOther(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response)
 	}
 
-	response := dto.SuccessResult{Status: "success", Data: subscribe}
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: subscribe})
 }
 
 func (h *handlerSubscribe) CreateSubscribe(c echo.Context) error {
@@ -82,7 +81,8 @@ func (h *handlerSubscribe) CreateSubscribe(c echo.Context) error {
 	}
 
 	validation := validator.New()
-	if err := validation.Struct(request); err != nil {
+	err := validation.Struct(request)
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
@@ -104,7 +104,7 @@ func (h *handlerSubscribe) CreateSubscribe(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: subscribe})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: subscribe})
 }
 
 func (h *handlerSubscribe) DeleteSubscribe(c echo.Context) error {
@@ -121,7 +121,7 @@ func (h *handlerSubscribe) DeleteSubscribe(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: data})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: data})
 }
 
 func (h *handlerSubscribe) GetSubscription(c echo.Context) error {
@@ -133,5 +133,5 @@ func (h *handlerSubscribe) GetSubscription(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, dto.SuccessResult{Status: "success", Data: subscribe})
+	return c.JSON(http.StatusOK, dto.SuccessResult{Code: http.StatusOK, Data: subscribe})
 }

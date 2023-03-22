@@ -1,8 +1,8 @@
-package middlewarepackage middleware
+package middleware
 
 import (
 	"context"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,7 +13,6 @@ import (
 func UploadPhoto(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		r := c.Request()
-		w := c.Response().Writer
 
 		// Upload file
 		// FormFile returns the first file for the given key `myFile`
@@ -23,14 +22,13 @@ func UploadPhoto(next echo.HandlerFunc) echo.HandlerFunc {
 
 		if err != nil && r.Method == "PATCH" {
 			ctx := context.WithValue(r.Context(), "dataPhoto", "false")
-			next(c)
-			return nil
+			c.SetRequest(r.WithContext(ctx))
+			return next(c)
 		}
 
 		if err != nil {
 			fmt.Println(err)
-			json.NewEncoder(w).Encode("Error Retrieving the File")
-			return nil
+			return c.JSON(http.StatusBadRequest, "Error Retrieving the File")
 		}
 		defer file.Close()
 		// fmt.Printf("Uploaded File: %+v\n", handler.Filename)
@@ -41,10 +39,10 @@ func UploadPhoto(next echo.HandlerFunc) echo.HandlerFunc {
 		// upload of 10 MB files.
 		r.ParseMultipartForm(MAX_UPLOAD_SIZE)
 		if r.ContentLength > MAX_UPLOAD_SIZE {
-			w.WriteHeader(http.StatusBadRequest)
-			response := Result{Code: http.StatusBadRequest, Message: "Max size in 10mb"}
-			json.NewEncoder(w).Encode(response)
-			return nil
+			return c.JSON(http.StatusBadRequest, echo.Map{
+				"code":    http.StatusBadRequest,
+				"message": "Max size in 10mb",
+			})
 		}
 
 		// Create a temporary file within our temp-images directory that follows
@@ -53,8 +51,7 @@ func UploadPhoto(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			fmt.Println(err)
 			fmt.Println("path upload error")
-			json.NewEncoder(w).Encode(err)
-			return nil
+			return c.JSON(http.StatusInternalServerError, err)
 		}
 		defer tempFile.Close()
 
@@ -72,8 +69,8 @@ func UploadPhoto(next echo.HandlerFunc) echo.HandlerFunc {
 		// filePhoto := data[8:] // split uploads/
 
 		// add filename to ctx
-		ctx := context.WithValue(r.Context(), "dataPhoto", data)
-		c.SetRequest(r.WithContext(ctx))
+		c.Set("dataPhoto", data)
+
 		return next(c)
 	}
 }

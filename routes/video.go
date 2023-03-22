@@ -9,20 +9,20 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func VideoRoutes(e *echo.Echo) {
+func VideoRoutes(e *echo.Group) {
 	videoRepository := repositories.RepositoryVideo(mysql.DB)
 	h := handlers.HandlerVideo(videoRepository)
 
 	e.GET("/videos", h.FindVideos)
 	e.GET("/video/:id", h.GetVideo)
 
-	e.POST("/video", h.CreateVideo, middleware.Auth, middleware.UploadVideo, middleware.UploadThumbnail)
-	e.PATCH("/video/:id", h.UpdateVideo, middleware.Auth, middleware.UploadVideo, middleware.UploadThumbnail)
+	e.POST("/video", middleware.Auth(middleware.UploadVideo(middleware.UploadThumbnail(h.CreateVideo))))
+	e.PATCH("/video/{id}", middleware.Auth(middleware.UploadVideo(middleware.UploadThumbnail(h.UpdateVideo))))
 
-	e.DELETE("/video/:id", h.DeleteVideo, middleware.Auth)
+	e.DELETE("/video/{id}", middleware.Auth(h.DeleteVideo))
 
-	e.GET("/myvideo", h.FindVideosByChannelId, middleware.Auth)
-	e.GET("/FindMyVideos", h.FindMyVideos, middleware.Auth)
+	e.GET("/myvideo", middleware.Auth(h.FindVideosByChannelId))
+	e.GET("/FindMyVideos", middleware.Auth(h.FindMyVideos))
 
-	e.PATCH("/UpdateViews/:id", h.UpdateViews, middleware.Auth)
+	e.PATCH("/UpdateViews/{id}", middleware.Auth(h.UpdateViews))
 }

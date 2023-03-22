@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func CommentRoutes(e *echo.Echo) {
+func CommentRoutes(e *echo.Group) {
 	commentRepository := repositories.RepositoryComment(mysql.DB)
 	h := handlers.HandlerComment(commentRepository)
 
