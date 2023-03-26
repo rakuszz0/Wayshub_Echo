@@ -17,12 +17,10 @@ func VideoRoutes(e *echo.Group) {
 	e.GET("/video/:id", h.GetVideo)
 
 	e.POST("/video", middleware.Auth(middleware.UploadVideo(middleware.UploadThumbnail(h.CreateVideo))))
-	e.PATCH("/video/{id}", middleware.Auth(middleware.UploadVideo(middleware.UploadThumbnail(h.UpdateVideo))))
+	e.PATCH("/video/:id", middleware.Auth(middleware.UploadVideo(middleware.UploadThumbnail(h.UpdateVideo))))
 
-	e.DELETE("/video/{id}", middleware.Auth(h.DeleteVideo))
+	e.DELETE("/video/:id", middleware.Auth(h.DeleteVideo))
 
 	e.GET("/myvideo", middleware.Auth(h.FindVideosByChannelId))
-	e.GET("/FindMyVideos", middleware.Auth(h.FindMyVideos))
-
-	e.PATCH("/UpdateViews/{id}", middleware.Auth(h.UpdateViews))
+	e.PATCH("/UpdateViews/:id", middleware.Auth(h.UpdateViews))
 }
